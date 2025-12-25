@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eiken Pre-1 Practice App (Day 2)</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Roboto', 'Noto Sans JP', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            padding-bottom: 60px;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .comic-container {
+            background-color: #fff;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .comic-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .timer-box {
+            background-color: #212529;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .model-answer-box {
+            background-color: #e9ecef;
+            border-left: 5px solid #0d6efd;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            border-radius: 0 5px 5px 0;
+        }
+        .advice-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .advice-title {
+            font-weight: bold;
+            color: #856404;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .score-display {
+            display: none;
+            animation: fadeIn 0.5s;
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+            color: #0f5132;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .score-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #198754;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header-section text-center">
+        <div class="container">
+            <h1>英検準1級 二次試験対策</h1>
+            <p class="lead mb-0">Interactive Practice App (Day 2)</p>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- Part 1: Narration Section -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="fs-5 text-primary"><i class="bi bi-chat-text-fill"></i> Part 1: Narration</span>
+                        <span class="badge bg-secondary">Prep: 1 min / Speak: 2 mins</span>
+                    </div>
+                    <div class="card-body">
+                        
+                        <!-- Instruction -->
+                        <div class="alert alert-primary d-flex align-items-center" role="alert">
+                            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Start with:</strong> "One day, an old lady was having a birthday party at her home."
+                            </div>
+                        </div>
+
+                        <!-- Comic Image Area -->
+                        <div class="comic-container mb-4">
+                            <img src="comic.jpg" alt="Please save the comic as comic.jpg" class="comic-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                            <div style="display:none; color: #6c757d;">
+                                <h5>画像未設定</h5>
+                                <p>PDFの4コマ漫画をスクショし、<strong>comic.jpg</strong> という名前で保存してください。</p>
+                            </div>
+                        </div>
+
+                        <!-- Timers -->
+                        <div class="row text-center mb-4">
+                            <div class="col-md-6 mb-3">
+                                <h6>Preparation</h6>
+                                <div id="timer-prep" class="timer-box">01:00</div>
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="startTimer('timer-prep', 60)">Start</button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="resetTimer('timer-prep', 60)">Reset</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6>Narration</h6>
+                                <div id="timer-narr" class="timer-box">02:00</div>
+                                <div>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="startTimer('timer-narr', 120)">Start</button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="resetTimer('timer-narr', 120)">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recorder & Score -->
+                        <div class="text-center p-3 border rounded bg-light">
+                            <h6><i class="bi bi-mic-fill"></i> Voice Recorder & AI Score</h6>
+                            <p class="small text-muted mb-2">長く詳しく話して、高得点を目指そう！</p>
+                            
+                            <button id="rec-btn-1" class="btn btn-danger rounded-pill px-4" onclick="toggleRecording(1, 'narration')">🔴 録音開始</button>
+                            
+                            <div class="mt-2">
+                                <audio id="audio-1" controls style="display:none; width: 100%; max-width: 400px; margin: 10px auto;"></audio>
+                            </div>
+
+                            <!-- Score Result Area -->
+                            <div id="score-1" class="score-display">
+                                <h5><i class="bi bi-award-fill"></i> Analysis Result</h5>
+                                <div>Speech Fluency Score: <span class="score-number" id="score-val-1">--</span> / 100</div>
+                                <div id="score-comment-1" class="small mt-1">Good effort!</div>
+                            </div>
+                        </div>
+
+                        <!-- Model Answer -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-dark" type="button" onclick="toggleAnswer('model-narration')">
+                                👁️ 模範解答とアドバイス (Model Answer)
+                            </button>
+                        </div>
+
+                        <div id="model-narration" class="model-answer-box">
+                            <h6>Narration Script</h6>
+                            <p class="eng-text" id="text-narration">
+                                One day, an old lady was having a birthday party at her home. Her son gave her a present. When she opened it, she found that it was a brand-new cell phone. She looked happy and thanked him for the gift.<br><br>
+                                The next day, at her house, the woman tried to use the phone, but she looked confused. She complained to her son that it was too complicated to use and told him that she didn't need a cell phone. Her son looked disappointed to hear that.<br><br>
+                                Two weeks later, the woman went hiking in the mountains with her friends. While they were walking down a path, she accidentally slipped on the ground and fell down. She seemed to be in pain and couldn't stand up.<br><br>
+                                A moment later, she remembered the phone. She used it to call emergency services. She was relieved to see that rescue workers were contacted. She realized that having the cell phone was very helpful after all.
+                            </p>
+                            <button class="btn btn-sm btn-success" onclick="speakText('text-narration')">🔊 音声再生 (Listen)</button>
+                            
+                            <!-- Advice Box (Restored) -->
+                            <div class="advice-box">
+                                <span class="advice-title"><i class="bi bi-lightbulb-fill"></i> ナレーションのアドバイス</span>
+                                <ul class="mb-0 ps-3">
+                                    <li><strong>吹き出しは「間接話法」に:</strong> "I don't need..." とそのまま読むのではなく、"She said that..." のようにストーリーに組み込みましょう。</li>
+                                    <li><strong>感情を描写する:</strong> 登場人物の様子を見て、<em>happy, confused, disappointed, relieved</em> などの感情語を加えましょう。</li>
+                                    <li><strong>時間の経過 (矢印) を言う:</strong> <em>The next day, Two weeks later, A moment later</em> を必ず文頭に入れて展開させましょう。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 2: Q&A Section -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <span class="fs-5"><i class="bi bi-question-circle-fill"></i> Part 2: Q&A</span>
+                    </div>
+                    <div class="card-body">
+                        
+                        <!-- Question 1 -->
+                        <div class="mb-5 border-bottom pb-4">
+                            <h5><span class="badge bg-success me-2">No. 1</span> Social Skills & IT</h5>
+                            <p class="fw-bold fs-5 my-3">
+                                "Do you think that young people are losing their social skills because of information technology?"
+                            </p>
+
+                            <!-- Recorder Q1 -->
+                            <div class="row align-items-center g-2 mb-3">
+                                <div class="col-auto">
+                                    <button id="rec-btn-2" class="btn btn-outline-danger btn-sm rounded-pill" onclick="toggleRecording(2, 'qa')">🔴 練習録音</button>
+                                </div>
+                                <div class="col">
+                                    <audio id="audio-2" controls style="display:none; height: 30px; width: 100%;"></audio>
+                                </div>
+                            </div>
+                            <div id="score-2" class="score-display py-2">
+                                <span class="fw-bold">Score: <span id="score-val-2" class="text-success">--</span></span>
+                                <span id="score-comment-2" class="small ms-2 text-muted"></span>
+                            </div>
+
+                            <button class="btn btn-outline-dark btn-sm mt-2" onclick="toggleAnswer('ans-q1')">解答例を表示</button>
+                            <div id="ans-q1" class="model-answer-box">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Option A: Yes</strong></p>
+                                        <p class="small" id="text-q1-yes">Yes, I think so. Many young people spend too much time communicating through text messages or social media. As a result, they have fewer opportunities to talk face-to-face, which makes them feel awkward or anxious when interacting with others in real life.</p>
+                                        <button class="btn btn-sm btn-success mb-2" onclick="speakText('text-q1-yes')">🔊 Listen</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Option B: No</strong></p>
+                                        <p class="small" id="text-q1-no">No, I don't think so. Technology actually helps young people stay connected with friends and meet new people from all over the world. They simply communicate in a different way, but they still build strong relationships and learn how to interact with others effectively.</p>
+                                        <button class="btn btn-sm btn-success mb-2" onclick="speakText('text-q1-no')">🔊 Listen</button>
+                                    </div>
+                                </div>
+                                <!-- Advice Box Q1 -->
+                                <div class="advice-box mt-3">
+                                    <span class="advice-title"><i class="bi bi-check-circle-fill"></i> 回答のポイント</span>
+                                    <ul class="mb-0 ps-3 small">
+                                        <li><strong>Yesの場合:</strong> 対面 (face-to-face) の機会減少や、リアルな会話への不安 (awkward/anxious) に触れると説得力が増します。</li>
+                                        <li><strong>Noの場合:</strong> 形式が変わっただけで、繋がり (connections) は維持・拡大されているという視点が有効です。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Question 2 -->
+                        <div class="mb-2">
+                            <h5><span class="badge bg-success me-2">No. 2</span> Busier Life & Tech</h5>
+                            <p class="fw-bold fs-5 my-3">
+                                "Do you think that new technology like e-mail has made us busier than before?"
+                            </p>
+
+                            <!-- Recorder Q2 -->
+                            <div class="row align-items-center g-2 mb-3">
+                                <div class="col-auto">
+                                    <button id="rec-btn-3" class="btn btn-outline-danger btn-sm rounded-pill" onclick="toggleRecording(3, 'qa')">🔴 練習録音</button>
+                                </div>
+                                <div class="col">
+                                    <audio id="audio-3" controls style="display:none; height: 30px; width: 100%;"></audio>
+                                </div>
+                            </div>
+                            <div id="score-3" class="score-display py-2">
+                                <span class="fw-bold">Score: <span id="score-val-3" class="text-success">--</span></span>
+                                <span id="score-comment-3" class="small ms-2 text-muted"></span>
+                            </div>
+
+                            <button class="btn btn-outline-dark btn-sm mt-2" onclick="toggleAnswer('ans-q2')">解答例を表示</button>
+                            <div id="ans-q2" class="model-answer-box">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Option A: Yes</strong></p>
+                                        <p class="small" id="text-q2-yes">Yes, definitely. Because of smartphones and e-mail, people are expected to reply to messages instantly, even on weekends or at night. This makes it difficult for people to relax and separate their work life from their private life.</p>
+                                        <button class="btn btn-sm btn-success mb-2" onclick="speakText('text-q2-yes')">🔊 Listen</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Option B: No</strong></p>
+                                        <p class="small" id="text-q2-no">No, I don't think so. Technology has made many tasks much faster and more efficient. For example, we can send documents instantly without going to the post office. This actually saves us time and allows us to focus on other important things.</p>
+                                        <button class="btn btn-sm btn-success mb-2" onclick="speakText('text-q2-no')">🔊 Listen</button>
+                                    </div>
+                                </div>
+                                <!-- Advice Box Q2 -->
+                                <div class="advice-box mt-3">
+                                    <span class="advice-title"><i class="bi bi-check-circle-fill"></i> 回答のポイント</span>
+                                    <ul class="mb-0 ps-3 small">
+                                        <li><strong>Yesの場合:</strong> 「常時接続 (always connected)」や「即レスの重圧 (expected to reply instantly)」を理由に挙げると定番です。</li>
+                                        <li><strong>Noの場合:</strong> 「効率化 (efficient)」や「時間の節約 (save time)」といったメリットを強調しましょう。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-muted mt-5 mb-5">
+            <small>Educational Tool | AI Score simulates fluency based on speech duration.</small>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // --- Timer Logic ---
+        let intervals = {};
+        function startTimer(id, seconds) {
+            if(intervals[id]) clearInterval(intervals[id]);
+            const display = document.getElementById(id);
+            let timeLeft = seconds;
+            updateDisplay(display, timeLeft);
+            intervals[id] = setInterval(() => {
+                timeLeft--;
+                updateDisplay(display, timeLeft);
+                if (timeLeft < 0) {
+                    clearInterval(intervals[id]);
+                    display.textContent = "TIME UP";
+                    display.style.color = "red";
+                }
+            }, 1000);
+        }
+        function resetTimer(id, seconds) {
+            if(intervals[id]) clearInterval(intervals[id]);
+            const display = document.getElementById(id);
+            updateDisplay(display, seconds);
+            display.style.color = "#00ff00";
+        }
+        function updateDisplay(element, seconds) {
+            if(seconds < 0) return;
+            let m = Math.floor(seconds / 60);
+            let s = seconds % 60;
+            element.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        // --- View Toggle ---
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "none" || el.style.display === "") {
+                el.style.display = "block";
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                el.style.display = "none";
+            }
+        }
+
+        // --- TTS ---
+        function speakText(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                const voices = window.speechSynthesis.getVoices();
+                const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Zira') || (v.lang === 'en-US'));
+                if(preferredVoice) utterance.voice = preferredVoice;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Browser not supported for TTS.");
+            }
+        }
+
+        // --- Recorder & Scoring Logic ---
+        let mediaRecorders = {};
+        let audioChunks = {};
+        let startTimes = {}; // to calculate duration
+
+        async function toggleRecording(id, type) {
+            const btn = document.getElementById(`rec-btn-${id}`);
+            const audioPlayer = document.getElementById(`audio-${id}`);
+            const scoreBox = document.getElementById(`score-${id}`);
+
+            if (btn.classList.contains('recording')) {
+                // STOP Recording
+                mediaRecorders[id].stop();
+                btn.innerHTML = "🔴 録り直す";
+                btn.classList.remove('recording', 'btn-warning');
+                btn.classList.add('btn-outline-danger');
+
+                // Calculate Duration
+                const duration = (Date.now() - startTimes[id]) / 1000;
+                
+                // Generate Score
+                calculateScore(id, duration, type);
+
+            } else {
+                // START Recording
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorders[id] = new MediaRecorder(stream);
+                    audioChunks[id] = [];
+                    startTimes[id] = Date.now(); // Start Timer
+                    
+                    // Hide previous score
+                    if(scoreBox) scoreBox.style.display = 'none';
+
+                    mediaRecorders[id].addEventListener("dataavailable", event => {
+                        audioChunks[id].push(event.data);
+                    });
+
+                    mediaRecorders[id].addEventListener("stop", () => {
+                        const audioBlob = new Blob(audioChunks[id], { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        audioPlayer.src = audioUrl;
+                        audioPlayer.style.display = 'block';
+                        stream.getTracks().forEach(track => track.stop());
+                    });
+
+                    mediaRecorders[id].start();
+                    btn.innerHTML = "⏹️ 停止 & 採点";
+                    btn.classList.add('recording', 'btn-warning');
+                    btn.classList.remove('btn-danger', 'btn-outline-danger');
+                    
+                } catch (err) {
+                    alert("Mic access denied.");
+                }
+            }
+        }
+
+        // --- Mock Scoring Algorithm (Motivation Oriented) ---
+        function calculateScore(id, duration, type) {
+            const scoreValEl = document.getElementById(`score-val-${id}`);
+            const scoreCommentEl = document.getElementById(`score-comment-${id}`);
+            const scoreBox = document.getElementById(`score-${id}`);
+            
+            let baseScore = 0;
+            let comment = "";
+
+            // Logic: Reward sufficient length, penalize very short silence
+            if (type === 'narration') {
+                // Target: 60s - 120s
+                if (duration < 10) { 
+                    baseScore = 30; comment = "Too short. Try to speak more!";
+                } else if (duration < 40) {
+                    baseScore = 60 + Math.random() * 10; comment = "Good start! Add more details.";
+                } else if (duration < 90) {
+                    baseScore = 80 + Math.random() * 10; comment = "Great flow! Almost full content.";
+                } else {
+                    baseScore = 90 + Math.random() * 8; comment = "Excellent! Very detailed narration.";
+                }
+            } else {
+                // Q&A Target: 15s - 45s
+                if (duration < 5) {
+                    baseScore = 40; comment = "Try to answer in full sentences.";
+                } else if (duration < 15) {
+                    baseScore = 70 + Math.random() * 10; comment = "Good answer!";
+                } else {
+                    baseScore = 85 + Math.random() * 13; comment = "Fantastic! Clear and detailed.";
+                }
+            }
+
+            // Cap score at 99
+            let finalScore = Math.min(Math.floor(baseScore), 99);
+            
+            // Show Result
+            scoreValEl.textContent = finalScore;
+            scoreCommentEl.textContent = comment;
+            scoreBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
